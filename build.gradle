@@ -21,14 +21,21 @@ allure {
 }
 
 dependencies {
+    implementation 'org.projectlombok:lombok:1.18.20'
     testImplementation(
+            //client
             "io.rest-assured:rest-assured:4.3.1",
+            //config
+            "org.aeonbits.owner:owner:1.0.12",
+            //json
+            "com.fasterxml.jackson.core:jackson-databind:2.11.2",
             "io.rest-assured:json-schema-validator:4.3.1",
             "org.assertj:assertj-core:3.19.0",
             'org.seleniumhq.selenium:selenium-java:3.141.59',
             'com.codeborne:selenide:5.21.0',
             "io.qameta.allure:allure-rest-assured:$allureVersion",
             "org.assertj:assertj-core:3.19.0",
+            //JUnit
             "org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 }
