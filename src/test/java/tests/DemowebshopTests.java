@@ -1,3 +1,7 @@
+package tests;
+
+import filters.CustomLogFilter;
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeAll;
@@ -9,6 +13,7 @@ import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
 import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
+import static filters.CustomLogFilter.customLogFilter;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.is;
 
@@ -25,6 +30,8 @@ public class DemowebshopTests {
     void loginWithCookieTest() {
         String authorizationCookie =
                 given()
+                        .filter(customLogFilter().withCustomTemplates())
+                        .log().uri()
                         .contentType("application/x-www-form-urlencoded")
                         .formParam("Email", "zatulivetrova@gmail.com")
                         .formParam("Password", "123456")
