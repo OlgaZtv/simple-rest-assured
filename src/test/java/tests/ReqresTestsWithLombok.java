@@ -2,12 +2,14 @@ package tests;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import tests.lombok.LombokUserData;
+import tests.lombok.Users;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.hasItem;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static tests.Specs.request;
 import static tests.Specs.responseSpec;
 
@@ -18,14 +20,15 @@ public class ReqresTestsWithLombok {
     @Test
     @DisplayName("Get user list")
     void getUserListwithLombok() {
-        LombokUserData data =
+        Users data =
                 given()
                         .spec(request)
                         .when()
                         .get("/users?page=2")
                         .then()
                         .log().body()
-                        .extract().as(LombokUserData.class);
+                        .extract().as(Users.class);
+
     }
 
     @Test
@@ -92,17 +95,33 @@ public class ReqresTestsWithLombok {
     @Test
     @DisplayName("Single User with lombok")
     void singleUserWithLombok() {
-        LombokUserData data = given()
-                .spec(request)
+        int expectedId = 2;
+        Users userResponse = given().spec(request)
                 .when()
-                .get("/users/2")
+                .pathParam("id", "2")
+                .get("/users/{id}")
                 .then()
                 .spec(responseSpec)
-                .log().body()
-                .extract().as(LombokUserData.class);
+                .extract().as(Users.class);
 
-        //assertEquals(2, data.getUser().getId());
+        assertEquals(expectedId, userResponse.getId());
     }
+
+    @Test
+    void checkIdAndEmailOfFeaturedUser() {
+        Users userResponse = given().spec(request)
+                .when()
+                .pathParam("id", "2")
+                .get("/users/{id}")
+                .then()
+                .spec(responseSpec)
+                .statusCode(200)
+                .extract().jsonPath().getObject("data", Users.class);
+
+        assertEquals(2, userResponse.getId());
+        assertTrue(userResponse.getEmail().endsWith("@reqres.in"));
+    }
+
 
     @Test
     public void checkEmailUsingGroovy() {

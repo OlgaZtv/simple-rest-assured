@@ -2,12 +2,14 @@ package tests.lombok;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class User {
+public class Users {
+    @JsonProperty("id")
     private Integer id;
+    @JsonProperty("email")
     private String email;
     private String password;
     @JsonProperty("first_name")
