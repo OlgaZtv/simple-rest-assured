@@ -2,14 +2,14 @@ package tests;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import tests.lombok.CreateUserRequest;
+import tests.lombok.CreateUserResponse;
+import tests.lombok.RegisterUser;
 import tests.lombok.Users;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.hasItem;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static tests.Specs.request;
 import static tests.Specs.responseSpec;
 
@@ -20,14 +20,12 @@ public class ReqresTestsWithLombok {
     @Test
     @DisplayName("Get user list")
     void getUserListwithLombok() {
-        Users data =
-                given()
-                        .spec(request)
-                        .when()
-                        .get("/users?page=2")
-                        .then()
-                        .log().body()
-                        .extract().as(Users.class);
+        Users data = given().spec(request)
+                .when()
+                .get("/users?page=2")
+                .then()
+                .log().body()
+                .extract().as(Users.class);
 
     }
 
@@ -43,53 +41,62 @@ public class ReqresTestsWithLombok {
     }
 
     @Test
-    @DisplayName("Create user")
-    void createUser() {
-        String body = "{\"name\": \"ivan\"," +
-                "\"job\": \"driver\"}";
-        given()
-                .spec(request)
-                .body(body)
+    @DisplayName("Create user lombok")
+    void createUserLombok() {
+        CreateUserRequest newCreateuser = new CreateUserRequest("ivan", "driver");
+
+        CreateUserResponse response = given().spec(request)
+                .body(newCreateuser)
                 .when()
                 .post("/users")
                 .then()
                 .statusCode(201)
-                .body("name", is("ivan"))
-                .body("job", is("driver"));
+                .extract().as(CreateUserResponse.class);
+
+        assertEquals(newCreateuser.getName(), response.getName());
+        assertEquals(newCreateuser.getJob(), response.getJob());
+        assertFalse(response.getId().isEmpty());
+        assertFalse(response.getCreatedAt().isEmpty());
+
     }
 
     @Test
-    @DisplayName("Update user")
-    void updateUser() {
-        String body = "{\"name\": \"morpheus\"," +
-                "\"job\": \"zion resident\"}";
+    @DisplayName("Update user lombok")
+    void updateUserLombok() {
+        CreateUserRequest newCreateuser = new CreateUserRequest("morpheus", "zion resident");
 
-        given()
-                .spec(request)
-                .body(body)
+        CreateUserResponse response = given().spec(request)
+                .body(newCreateuser)
                 .when()
                 .put("/users/2")
                 .then()
                 .spec(responseSpec)
-                .body("name", is("morpheus"))
-                .body("job", is("zion resident"))
-                .body("updatedAt", notNullValue());
+                .extract().as(CreateUserResponse.class);
+
+        assertEquals(newCreateuser.getName(), response.getName());
+        assertEquals(newCreateuser.getJob(), response.getJob());
+        // assertNotNull(response.getUpdateAt());
+
     }
 
     @Test
-    @DisplayName("Register successful")
-    void registerSuccessful() {
-        String body = "{\"email\": \"eve.holt@reqres.in\"," +
-                "\"password\": \"pistol\"}";
-        given()
-                .spec(request)
-                .body(body)
+    @DisplayName("Register successful Lombok")
+    void registerSuccessfulLombok() {
+        RegisterUser registrationData = new RegisterUser();
+        registrationData.setEmail("eve.holt@reqres.in");
+        registrationData.setPassword("pistol");
+
+        CreateUserResponse response = given().spec(request)
+                .body(registrationData)
                 .when()
                 .post("/register")
                 .then()
                 .spec(responseSpec)
-                .body("id", is(4))
-                .body("token", is("QpwL5tke4Pnpja7X4"));
+                .extract().as(CreateUserResponse.class);
+
+
+        assertEquals("4", response.getId());
+        assertEquals("QpwL5tke4Pnpja7X4", response.getToken());
     }
 
     @Test
